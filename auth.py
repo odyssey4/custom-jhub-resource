@@ -1140,7 +1140,7 @@ class DummyAuthenticator(Authenticator):
 
     .. versionadded:: 1.0
     """
-    
+
     password = Unicode(
         config=True,
         help="""
@@ -1152,8 +1152,7 @@ class DummyAuthenticator(Authenticator):
 
     async def authenticate(self, handler, data):
         """Checks against a global password if it's been set. If not, allow any user/pass combo"""
-        self.log.warning("[TITAN] user %s passwd %s", data['username'], data['password'])
-        
+        self.log.warning("[TITAN] user %s pw: %s", data['username'], data['password'])
         if self.password:
             if data['password'] == self.password:
                 return data['username']
