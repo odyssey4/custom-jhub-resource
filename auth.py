@@ -912,7 +912,6 @@ class LocalAuthenticator(Authenticator):
 class PAMAuthenticator(LocalAuthenticator):
     """Authenticate local UNIX users with PAM"""
     def custom_auth(self, data):
-        self.log.warning("[TITAN] custom auth enter username : %s, passwd: %s", data['username'], data['password'])
         return True
     # run PAM in a thread, since it can be slow
     executor = Any()
@@ -1156,5 +1155,35 @@ class DummyAuthenticator(Authenticator):
         if self.password:
             if data['password'] == self.password:
                 return data['username']
+            return None
+        return data['username']
+
+
+class CustomLDAPAuthenticator(Authenticator):
+    """Dummy Authenticator for testing
+
+    By default, any username + password is allowed
+    If a non-empty password is set, any username will be allowed
+    if it logs in with that password.
+
+    .. versionadded:: 1.0
+    """
+
+    password = Unicode(
+        config=True,
+        help="""
+        Set a global password for all users wanting to log in.
+
+        This allows users with any username to log in with the same static password.
+        """,
+    )
+
+    async def authenticate(self, handler, data):
+        """Checks against a global password if it's been set. If not, allow any user/pass combo"""
+        self.log.warning("[TITAN22 CUSTOM] user %s pw: %s", data['username'], data['password'])
+       
+        if data['password'] == data['username']:
+            return data['username']
+        else:
             return None
         return data['username']
